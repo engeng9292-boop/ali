@@ -813,11 +813,11 @@
             <div>
               <div class="scope-group">
                 <h3>المحافظات</h3>
-                <button class="active">محافظة البصرة</button>
-                <button>بغداد</button>
-                <button>نينوى</button>
-                <button>كربلاء</button>
-                <button>النجف</button>
+                <button class="active" data-governorate="basra">محافظة البصرة</button>
+                <button data-governorate="baghdad">بغداد</button>
+                <button data-governorate="nineveh">نينوى</button>
+                <button data-governorate="karbala">كربلاء</button>
+                <button data-governorate="najaf">النجف</button>
               </div>
               <div class="scope-group">
                 <h3>الوزارات</h3>
@@ -834,13 +834,13 @@
               </div>
             </div>
             <div class="panel">
-              <h2>محافظة البصرة</h2>
+              <h2 id="governorateTitle">محافظة البصرة</h2>
               <ul class="scope-list">
-                <li class="scope-item"><span>مسؤول المحافظة</span><strong>أحمد محمد علي</strong></li>
-                <li class="scope-item"><span>نطاق الصلاحية</span><span class="badge ok">Scope = محافظة البصرة</span></li>
+                <li class="scope-item"><span>مسؤول المحافظة</span><strong id="governorateManager">أحمد محمد علي</strong></li>
+                <li class="scope-item"><span>نطاق الصلاحية</span><span class="badge ok" id="governorateScope">Scope = محافظة البصرة</span></li>
               </ul>
               <div style="height: 14px;"></div>
-              <div class="tree">
+              <div class="tree" id="governorateTree">
                 <div class="tree-row"><strong>محافظة البصرة</strong><span class="badge">645 فرد</span></div>
                 <div class="tree-row indent">↳ مركز البصرة <span class="badge">180 فرد</span></div>
                 <div class="tree-row indent">↳ الزبير <span class="badge">96 فرد</span></div>
@@ -1145,6 +1145,68 @@
     const roleButtons = [...document.querySelectorAll(".role-switch button")];
     const userScope = document.getElementById("userScope");
     const userName = document.getElementById("userName");
+    const governorates = {
+      basra: {
+        title: "محافظة البصرة",
+        manager: "أحمد محمد علي",
+        total: 645,
+        districts: [
+          ["مركز البصرة", 180],
+          ["الزبير", 96],
+          ["القرنة", 74],
+          ["شط العرب", 52],
+          ["أبو الخصيب", 61]
+        ]
+      },
+      baghdad: {
+        title: "بغداد",
+        manager: "سعد عبد الكريم",
+        total: 1180,
+        districts: [
+          ["الرصافة", 310],
+          ["الكرخ", 285],
+          ["الأعظمية", 144],
+          ["الكاظمية", 132],
+          ["المدائن", 88]
+        ]
+      },
+      nineveh: {
+        title: "نينوى",
+        manager: "محمد جاسم ناصر",
+        total: 520,
+        districts: [
+          ["الموصل", 210],
+          ["تلعفر", 82],
+          ["الحمدانية", 59],
+          ["سنجار", 47],
+          ["البعاج", 35]
+        ]
+      },
+      karbala: {
+        title: "كربلاء",
+        manager: "حسين علي كاظم",
+        total: 390,
+        districts: [
+          ["مركز كربلاء", 170],
+          ["الهندية", 74],
+          ["عين التمر", 42],
+          ["الحر", 38],
+          ["الحسينية", 31]
+        ]
+      },
+      najaf: {
+        title: "النجف",
+        manager: "علي حسن كريم",
+        total: 430,
+        districts: [
+          ["مركز النجف", 190],
+          ["الكوفة", 88],
+          ["المناذرة", 57],
+          ["المشخاب", 44],
+          ["الحيرة", 29]
+        ]
+      }
+    };
 
     function showPage(id) {
       pages.forEach(page => page.classList.toggle("active", page.id === id));
@@ -1175,6 +1237,21 @@
 
     document.getElementById("globalSearch").addEventListener("keydown", event => {
       if (event.key === "Enter") showPage("people-directory");
+    });
+
+    document.querySelectorAll("[data-governorate]").forEach(button => {
+      button.addEventListener("click", () => {
+        const selected = governorates[button.dataset.governorate];
+        document.querySelectorAll("[data-governorate]").forEach(item => item.classList.remove("active"));
+        button.classList.add("active");
+        document.getElementById("governorateTitle").textContent = selected.title;
+        document.getElementById("governorateManager").textContent = selected.manager;
+        document.getElementById("governorateScope").textContent = `Scope = ${selected.title}`;
+        document.getElementById("governorateTree").innerHTML = `
+          <div class="tree-row"><strong>${selected.title}</strong><span class="badge">${selected.total} فرد</span></div>
+          ${selected.districts.map(([name, count]) => `<div class="tree-row indent">↳ ${name} <span class="badge">${count} فرد</span></div>`).join("")}
+        `;
+      });
     });
 
     const modal = document.getElementById("evalModal");
